@@ -1,0 +1,39 @@
+<resources>
+
+	<string name="app_name">Costco Shopping List</string>
+	<string name="menu_settings">Settings</string>
+	<string name="title_activity_login">LoginActivity</string>
+	<string name="title_activity_view_list">ViewListActivity</string>
+	<string name="title_activity_edit_list">EditListActivity</string>
+    
+	<string name="login">Login</string>
+	<string name="loginEmailText">Email:</string>
+	<string name="loginPwordText">Password:</string>
+	<string name="viewListEditButtonText">Edit List</string>
+	<string name="editListDelete">Delete</string>
+	<string name="editListAddButtonText">New Item</string>
+	<string name="editListSaveButtonText">Save List</string>
+	<string name="editListCategory">Category</string>
+	<string name="editListCatPrompt">Select a Category:</string>
+	
+	<string-array name="categories">
+		<item>Appliances</item>
+		<item>Baby/Toys</item>
+		<item>Clothing</item>
+		<item>Computers</item>
+		<item>Electronics</item>
+		<item>Food</item>
+		<item>Furniture</item>
+		<item>Gifts</item>
+		<item>Hardware</item>
+		<item>Health/Beauty</item>
+		<item>Home/Seasonal</item>
+		<item>Jewelry</item>
+		<item>Office</item>
+		<item>Patio/Garden</item>
+		<item>Pets</item>
+		<item>Sports</item>
+		<item>Others</item>
+	</string-array>
+
+</resources>
