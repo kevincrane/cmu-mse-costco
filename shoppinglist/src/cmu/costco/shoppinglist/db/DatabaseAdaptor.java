@@ -129,7 +129,9 @@ public class DatabaseAdaptor {
 	 */
 	public DatabaseAdaptor open() throws SQLException {
 		dbHelper = new DatabaseHelper(ctx);
-		db = dbHelper.getWritableDatabase();
+		if(db == null || !db.isOpen()) {
+			db = dbHelper.getWritableDatabase();
+		}
 		return this;
 	}
 	

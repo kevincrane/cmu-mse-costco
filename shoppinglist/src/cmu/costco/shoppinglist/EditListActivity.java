@@ -1,12 +1,16 @@
 package cmu.costco.shoppinglist;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,10 +30,17 @@ public class EditListActivity extends Activity {
 	
 	private final static String TAG = "EditListActivity";
 	
+	private static final int VOICE_REQUEST_CODE = 1234;
+	private boolean voiceButtonEnabled = true;
+	private View addItemView;
+	
 	private DatabaseAdaptor db;
 	private Customer cust;
 	
 	
+	/**
+	 * Run when the user wants to edit their shopping list
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,6 +59,17 @@ public class EditListActivity extends Activity {
 		// Load Customer and shoppingList from DB
 		cust = db.dbGetCustomer(memberId);
 		cust.setShoppingList(db.dbGetShoppingListItems(memberId));
+		
+		// Prepare AddItem view; Inflate XML layout for adding new item, add to scrolling list
+		addItemView = getLayoutInflater().inflate(R.layout.activity_edit_list_new, null);
+		
+		// Disable voice recognition button if no recognition service is present
+		PackageManager pm = getPackageManager();
+		List<ResolveInfo> activities = pm.queryIntentActivities(
+				new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+		if (activities.size() == 0) {
+			voiceButtonEnabled = false;
+		}
 				
 		// Add list of ShoppingListItems
 		ScrollView scroll = (ScrollView)findViewById(R.id.editListScroll);
@@ -213,10 +235,43 @@ public class EditListActivity extends Activity {
 		scroll.removeAllViews();
 		scroll.addView(generateEditListView(this, cust.getShoppingList()));
 		
-		// Inflate XML layout for adding new item, add to scrolling list
-		View newItem = getLayoutInflater().inflate(R.layout.activity_edit_list_new, null);
-		((ViewGroup)scroll.getChildAt(0)).addView(newItem);
-		newItem.requestFocus();
+		// Disable voice button if speech recognition not supported
+		Button voiceButton = (Button)addItemView.findViewById(R.id.editNewItemVoiceButton); 
+		voiceButton.setEnabled(voiceButtonEnabled);
+		
+		// Add NewItem view to bottom of ScrollView and set focus to bottom
+		((ViewGroup)scroll.getChildAt(0)).addView(addItemView);
+		addItemView.requestFocus(View.FOCUS_DOWN);
+	}
+	
+	
+	/**
+	 * Add a new item to the list via voice recognition
+	 * @param view
+	 */
+	public void addItemByVoice(View view) {
+		Intent voiceIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		voiceIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+				RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		voiceIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak the item you need...");
+		startActivityForResult(voiceIntent, VOICE_REQUEST_CODE);
+	}
+	
+	/**
+	 * Handle the results from the voice recognition activity.
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if (requestCode == VOICE_REQUEST_CODE && resultCode == RESULT_OK) {
+			// Retrieve voice recognizer results from intent
+			ArrayList<String> voiceResult = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+			
+			// Set text contents of new item to most likely result 
+			TextView newItemText = (TextView)addItemView.findViewById(R.id.editNewItemDescription);
+			newItemText.setText(voiceResult.get(0));
+		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
 }

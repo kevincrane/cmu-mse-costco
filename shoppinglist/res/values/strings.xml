@@ -15,6 +15,7 @@
 	<string name="editListSaveButtonText">Save List</string>
 	<string name="editListCategory">Category</string>
 	<string name="editListCatPrompt">Select a Category:</string>
+	<string name="editListVoiceButton">Voice</string>
 	
 	<string-array name="categories">
 		<item>Appliances</item>
