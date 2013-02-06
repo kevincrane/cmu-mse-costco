@@ -15,6 +15,8 @@ public class DbContract {
 		public static final String NAME_LAST = "name_last";
 		public static final String ADDRESS = "address";
 	}
+
+// Bug Fix
 	
 	/** Constants for ListItemEntry table in DB */
 	public static abstract class ListItemEntry implements BaseColumns {
