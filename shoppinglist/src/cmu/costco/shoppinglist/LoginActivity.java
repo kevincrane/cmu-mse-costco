@@ -16,6 +16,7 @@ public class LoginActivity extends Activity {
 	public final static String MEMBERID = "MEMBERID";
 	
 	private static final String TAG = "LoginActivity";
+	private String nothing = "hello";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
