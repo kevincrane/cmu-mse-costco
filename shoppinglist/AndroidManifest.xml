@@ -2,7 +2,7 @@
     package="cmu.costco.shoppinglist"
     android:versionCode="1"
     android:versionName="1.0" >
-    
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"> 
+            android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,17 +26,21 @@
         </activity>
         <activity
             android:name=".ViewListActivity"
-            android:label="@string/title_activity_view_list">
+            android:label="@string/title_activity_view_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.helloandroid.LoginActivity" />
         </activity>
         <activity
             android:name=".EditListActivity"
-            android:label="@string/title_activity_edit_list">
+            android:label="@string/title_activity_edit_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.helloandroid.ViewListActivity" />
+        </activity>
+        <activity
+            android:name=".NotificationActivity"
+            android:label="@string/title_activity_notification" >
         </activity>
     </application>
 
