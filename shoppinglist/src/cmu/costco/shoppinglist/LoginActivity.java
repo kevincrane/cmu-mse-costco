@@ -2,7 +2,6 @@ package cmu.costco.shoppinglist;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -104,4 +103,4 @@ public class LoginActivity extends Activity {
 		}
 	}
 	
-}
+} 

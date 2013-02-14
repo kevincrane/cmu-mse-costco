@@ -274,4 +274,4 @@ public class EditListActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
-}
+} 
