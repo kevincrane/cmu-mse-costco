@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -20,35 +22,35 @@ import cmu.costco.shoppinglist.db.DatabaseAdaptor;
 import cmu.costco.shoppinglist.objects.Customer;
 import cmu.costco.shoppinglist.objects.ShoppingListItem;
 
-public class ViewListActivity extends Activity {
+public class ViewListActivity extends Activity  {
 
 	private final static String TAG = "ViewListActivity";
-	
+
 	private DatabaseAdaptor db;
 	private Customer cust;
 	
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// Set the text view as the activity layout
 		setContentView(R.layout.activity_view_list);
-		
+
 		// Open database
 		db = new DatabaseAdaptor(this);
 		db.open();
-		
+
 		// Get the message from the intent
 		Intent intent = getIntent();
 		int memberId = intent.getIntExtra(LoginActivity.MEMBERID, 1);
-		
+
 		// Load Customer and shoppingList from DB
 		cust = db.dbGetCustomer(memberId);
 		cust.setShoppingList(db.dbGetShoppingListItems(memberId));
-				
+
 		// Add list of ShoppingListItems
-		ScrollView scroll = (ScrollView)findViewById(R.id.viewListScroll);
+		ScrollView scroll = (ScrollView) findViewById(R.id.viewListScroll);
 		LinearLayout itemList = generateListView(this, cust.getShoppingList());
 		scroll.addView(itemList);
 	}
@@ -59,48 +61,51 @@ public class ViewListActivity extends Activity {
 		db.open();
 	}
 
-	
 	/**
 	 * Generate an Android View to display the ShoppingList
+	 * 
 	 * @param shoppingList
 	 */
-	private LinearLayout generateListView(Context ctx, Map<String, ArrayList<ShoppingListItem>> shoppingList) {
+	private LinearLayout generateListView(Context ctx,
+			Map<String, ArrayList<ShoppingListItem>> shoppingList) {
 		// Create the view that will be returned
 		LinearLayout view = new LinearLayout(ctx);
 		view.setOrientation(LinearLayout.VERTICAL);
-		
-		if(shoppingList.size() == 0) {
+
+		if (shoppingList.size() == 0) {
 			TextView emptyRow = new TextView(ctx);
 			emptyRow.setTextSize(24);
 			emptyRow.setText("No items in Shopping List");
 			view.addView(emptyRow);
 			return view;
 		}
-		
+
 		// Iterate through each item category
-		for(String category : shoppingList.keySet()) {
+		for (String category : shoppingList.keySet()) {
 			Log.i(TAG, "Iterating through category '" + category + "'.");
-			
-			if(shoppingList.get(category).size() > 0) {
+
+			if (shoppingList.get(category).size() > 0) {
 				// Generate the TextView row to display the category name
 				TextView catRow = new TextView(ctx);
 				catRow.setTextSize(18);
 				catRow.setText(category);
 				view.addView(catRow);
-				
+
 				// Iterate through each item within the category
-				for(final ShoppingListItem item : shoppingList.get(category)) {
-					Log.i(TAG, "    Item: " + item.getItem().getDescription() + " - " + item.isChecked());
+				for (final ShoppingListItem item : shoppingList.get(category)) {
+					Log.i(TAG, "    Item: " + item.getItem().getDescription()
+							+ " - " + item.isChecked());
 					view.addView(createItemCheckbox(ctx, item));
 				}
 			}
 		}
-		
+
 		return view;
 	}
-	
+
 	/**
 	 * Create a checkbox/description row view to be added to the shopping list
+	 * 
 	 * @param ctx
 	 * @param item
 	 * @return CheckBox view
@@ -109,31 +114,37 @@ public class ViewListActivity extends Activity {
 		// Generate the CheckBox/text row for the item
 		CheckBox checkbox = new CheckBox(ctx);
 		checkbox.setText(item.getItem().getDescription());
-		if(item.isChecked()) {
+		if (item.isChecked()) {
 			checkbox.setChecked(true);
-			checkbox.setPaintFlags(checkbox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			checkbox.setPaintFlags(checkbox.getPaintFlags()
+					| Paint.STRIKE_THRU_TEXT_FLAG);
 		}
-		
+
 		// Create a listener to change the item state when checked
 		checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton checkBoxView,
 					boolean isChecked) {
-				Log.i(TAG, "Setting checkbox of item " + item.getItemId() + " to " + isChecked);
-				db.dbSetItemChecked(cust.getMemberId(), item.getItemId(), isChecked);
-				if(isChecked) {
-					checkBoxView.setPaintFlags(checkBoxView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+				Log.i(TAG, "Setting checkbox of item " + item.getItemId()
+						+ " to " + isChecked);
+				db.dbSetItemChecked(cust.getMemberId(), item.getItemId(),
+						isChecked);
+				if (isChecked) {
+					checkBoxView.setPaintFlags(checkBoxView.getPaintFlags()
+							| Paint.STRIKE_THRU_TEXT_FLAG);
 				} else {
-					checkBoxView.setPaintFlags(checkBoxView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+					checkBoxView.setPaintFlags(checkBoxView.getPaintFlags()
+							& ~Paint.STRIKE_THRU_TEXT_FLAG);
 				}
 			}
 		});
-		
+
 		return checkbox;
 	}
-	
+
 	/**
 	 * Switch to EditList activity
+	 * 
 	 * @param view
 	 */
 	public void editList(View view) {
@@ -141,5 +152,26 @@ public class ViewListActivity extends Activity {
 		intent.putExtra(LoginActivity.MEMBERID, cust.getMemberId());
 		startActivity(intent);
 	}
-	
+
+	// Proximity Alert menu function
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_proximityalert, menu);
+		return true;
+	}
+
+	// Add an item into the shopping list
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+
+		if (item.getItemId() == R.id.AddProximityAlert) {
+			Intent intent = new Intent(this, NotificationActivity.class);
+			startActivity(intent);
+		}
+		
+		return true;
+	}
+    
+    
 }
