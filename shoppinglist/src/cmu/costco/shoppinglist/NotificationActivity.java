@@ -63,6 +63,7 @@ public class NotificationActivity extends Activity implements LocationListener {
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 		}
 		catch (Exception e) {
+			//FIXME: don't catch generic Exceptions. Identify what type can be thrown. Good coding practice.
 			Log.e(getClass().getSimpleName(), e.getMessage());
 		}
     }

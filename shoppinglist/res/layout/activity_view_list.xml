@@ -1,37 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
+    <!-- Header/Page Title -->
     <TextView
         android:id="@+id/viewListHeader"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:layout_weight="0.05"
         android:text="@string/app_name"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    
+    <!-- Shopping List Items -->
     <ScrollView
         android:id="@+id/viewListScroll"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="bottom"
-        android:layout_weight="0.8" />
+        android:layout_gravity="bottom" >
+    </ScrollView>
+    
+    
+    <!-- Bottom Divider -->
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dp"
+		android:background="@android:color/darker_gray"/>
+    
+	<!-- Toggle Proximity Alerts -->
+    <LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" >
+		<TextView
+			android:id="@+id/textView1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/toggleProxAlertLabel"
+			android:textAppearance="?android:attr/textAppearanceMedium" />
+		<ToggleButton
+			android:id="@+id/toggleButton1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:onClick="toggleProximityAlerts" />
+	</LinearLayout>
+    
 
+    <!-- Bottom Button: Edit List -->
     <LinearLayout
         android:id="@+id/viewListButtonBar"
         style="@android:style/ButtonBar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_weight="0.1"
         android:orientation="vertical" >
 
         <Button
             android:id="@+id/viewListEditButton"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="editList"
             android:text="@string/viewListEditButtonText" />
