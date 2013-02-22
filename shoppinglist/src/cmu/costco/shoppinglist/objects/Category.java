@@ -1,10 +1,14 @@
 package cmu.costco.shoppinglist.objects;
 
+import android.content.Loader;
+
 
 /**
  * @author kevin
  *
  */
+
+/* FIXME: nothing here is useful, leftover artifact from earlier?
 public enum Category {
 	APPLIANCES(1),
 	BABYTOYS(2),
@@ -31,5 +35,32 @@ public enum Category {
 	
 	public int getId() {
 		return id;
+	}
+}
+*/
+public class Category {
+	private String name;
+	private Location location;
+	
+	public Category(String name, Location location) {
+		this.name = name;
+		this.location = location;
+	}
+	
+	public String getName() { return name; }
+	public Location getLocation() { return location; }
+	
+	/** Used for saving category locations as a single object */
+	public static class Location {
+		final private double lat;
+		final private double lon;
+		
+		public Location(double lat, double lon) {
+			this.lat = lat;
+			this.lon = lon;
+		}
+		
+		public double getLat() { return lat; }
+		public double getLon() { return lon; }
 	}
 }
