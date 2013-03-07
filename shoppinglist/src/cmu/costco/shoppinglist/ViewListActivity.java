@@ -43,9 +43,14 @@ public class ViewListActivity extends Activity  {
 		super.onCreate(savedInstanceState);
 		
 		//TODO: do something real (this is kinda dumb). Also doesn't handle any other cases
-		categories.put("Electronics", new Location(40.44563, -79.948727));	// Chinese food place
-		categories.put("Clothing", new Location(40.445375, -79.94866));		// Corner across Quiznos
-		categories.put("Food", new Location(40.444697, -79.94862));			// Pizza Guy
+		// Near CMU
+//		categories.put("Electronics", new Location(40.44563, -79.948727));	// Chinese food place
+//		categories.put("Clothing", new Location(40.445375, -79.94866));		// Corner across Quiznos
+//		categories.put("Food", new Location(40.444697, -79.94862));			// Pizza Guy
+		// Test locations for Seattle's Costco HQ
+		categories.put("Electronics", new Location(47.551336, -122.065294));
+		categories.put("Clothing", new Location(47.551604, -122.065369));
+		categories.put("Food", new Location(47.551376, -122.065149));
 
 		
 		// Set the text view as the activity layout
@@ -225,7 +230,7 @@ public class ViewListActivity extends Activity  {
 				// Add the proximity alert
 				Location categoryLoc = categories.get(category);
 				ShoppingListApplication application = (ShoppingListApplication)getApplication();
-				application.addProximityAlert(categoryLoc.getLat(), categoryLoc.getLat(), 15, -1, message);
+				application.addProximityAlert(categoryLoc.getLat(), categoryLoc.getLon(), 15, -1, message);
 			}
 		} else {
 			// Remove proximity alerts for every category on the user's list
