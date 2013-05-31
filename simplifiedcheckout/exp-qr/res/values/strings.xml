@@ -2,7 +2,16 @@
 <resources>
 
     <string name="app_name">SimplifiedCheckout-QR</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="scanner_text">Barcode Scanner Test</string>
+    <string name="scandit_button_text">Scan Barcode - Scandit</string>
+    <string name="zxing_button_text">\ Scan Barcode - ZXing\ </string>
+    
+    <string name="activity_title_scan_zxing">Scan Barcode - ZXing</string>
+    
+    <string name="scan_zxing_title">Scan Test - ZXing</string>
+    <string name="scan_zxing_desc_text">Press Scan button in order to scan a barcode or QR code&#8230;</string>
+    <string name="scan_zxing_text">Scan</string>
+    <string name="scan_zxing_result">Scan result</string>
 
 </resources>
