@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout 
+    android:id="@+id/FrameLayout01" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"
+    android:background="#FF000000"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <RelativeLayout
+        android:id="@+id/root"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+	    <TextView
+	        android:id="@+id/title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Scandit SDK"
+	        android:textSize="50sp"
+	        android:textColor="#FFFFFFFF"
+	        android:layout_marginTop="40dp"
+	        android:layout_centerHorizontal="true"
+	        />
+        <TextView
+            android:id="@+id/demo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Demo App"
+            android:textSize="30sp"
+            android:textColor="#FFFFFFFF"
+            android:layout_alignLeft="@id/title"
+            android:layout_below="@id/title"
+            />
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/version"
+            android:textSize="30sp"
+            android:textColor="#FFFFFFFF"
+            android:layout_alignRight="@id/title"
+            android:layout_below="@id/title"
+            />
+        <TextView
+            android:id="@+id/link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="www.scandit.com"
+            android:textSize="25sp"
+            android:textColor="#FFFFFFFF"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            />
+        
+        <Button
+            android:id="@+id/fullscreen_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Full Screen Scan View"
+            android:textColor="#FF000000"
+            android:layout_above="@+id/link"
+            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true"
+            />
+        
+        <Button
+            android:id="@+id/scaled_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scaled Scan View"
+            android:textColor="#FF000000"
+            android:layout_above="@+id/fullscreen_button"
+            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true"
+            />
+        
+        <Button
+            android:id="@+id/cropped_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cropped Scan View"
+            android:textColor="#FF000000"
+            android:layout_above="@+id/scaled_button"
+            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true"
+            />
+    </RelativeLayout>
+</FrameLayout>
+

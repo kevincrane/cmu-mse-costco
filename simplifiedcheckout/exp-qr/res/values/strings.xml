@@ -6,12 +6,16 @@
     <string name="scanner_text">Barcode Scanner Test</string>
     <string name="scandit_button_text">Scan Barcode - Scandit</string>
     <string name="zxing_button_text">\ Scan Barcode - ZXing\ </string>
-    
     <string name="activity_title_scan_zxing">Scan Barcode - ZXing</string>
-    
     <string name="scan_zxing_title">Scan Test - ZXing</string>
     <string name="scan_zxing_desc_text">Press Scan button in order to scan a barcode or QR code&#8230;</string>
     <string name="scan_zxing_text">Scan</string>
     <string name="scan_zxing_result">Scan result</string>
+    <string name="scan_scandit_title">Scan Test - Scandit</string>
+    <string name="scan_scandit_desc_text">Press Scan button in order to scan a barcode or QR code&#8230;</string>
+    <string name="scan_scandit_text">Scan</string>
+    <string name="scan_scandit_result">Scan result</string>
+    <string name="title_activity_scandit_scan">ScanditScanActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

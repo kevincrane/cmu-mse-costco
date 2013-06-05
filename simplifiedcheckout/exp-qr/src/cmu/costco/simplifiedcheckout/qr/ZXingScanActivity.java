@@ -31,10 +31,10 @@ public class ZXingScanActivity extends Activity implements OnClickListener {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 		if(scanResult != null) {
-			Log.i("SCAN", "scan result: " + scanResult);
+			Log.i("scanner", "scan result: " + scanResult);
 			resultTextView.setText(scanResult.toString());
 		} else {
-			Log.e("SCAN", "Sorry, the scan was unsuccessful...");
+			Log.e("scanner", "Sorry, the scan was unsuccessful...");
 			Toast.makeText(this, "Sorry, the scan was unsuccessful...", Toast.LENGTH_LONG).show();
 		}
 	}
