@@ -1,12 +1,10 @@
 package cmu.costco.shoppinglist;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -34,24 +32,9 @@ public class ViewListActivity extends Activity  {
 	private DatabaseAdaptor db;
 	private Customer cust;
 	
-	//TODO: do something real (this is kinda dumb). Make the Category object do something. Map {CategoryName->Loc}
-	private static Map<String, Location> categories = new HashMap<String, Location>(); 
-	
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//TODO: do something real (this is kinda dumb). Also doesn't handle any other cases
-		// Near CMU
-//		categories.put("Electronics", new Location(40.44563, -79.948727));	// Chinese food place
-//		categories.put("Clothing", new Location(40.445375, -79.94866));		// Corner across Quiznos
-//		categories.put("Food", new Location(40.444697, -79.94862));			// Pizza Guy
-		// Test locations for Seattle's Costco HQ
-		categories.put("Electronics", new Location(47.551336, -122.065294));
-		categories.put("Clothing", new Location(47.551604, -122.065369));
-		categories.put("Food", new Location(47.551376, -122.065149));
-
 		
 		// Set the text view as the activity layout
 		setContentView(R.layout.activity_view_list);
@@ -192,6 +175,48 @@ public class ViewListActivity extends Activity  {
 		
 		return true;
 	}
+	
+	
+	/**
+	 * Creates a pretty comma-separated list of items in a given category as a string
+	 * @param category
+	 * @param items
+	 * @return
+	 */
+	private String printListReminder(String category, List<ShoppingListItem> items) {
+		String itemText = "";
+		// Create a nice comma-separated list of items with an 'and' at the end; TODO: make cleaner
+		if(items.isEmpty()) { 
+			itemText = "something";
+		} else if(items.size() == 1) {
+			itemText = items.get(0).getItem().getDescription();
+		} else if(items.size() == 2) {
+			itemText = items.get(0).getItem().getDescription()
+					+ " and " + items.get(1).getItem().getDescription();
+		} else {
+			for(int i=0; i<items.size()-1; i++) {
+				itemText += items.get(i).getItem().getDescription() + ", ";
+			}
+			itemText += "and " + items.get(items.size()-1).getItem().getDescription();
+		}
+		String message = "You are near the " + category + " section. Don't forget to buy " + itemText + "!";
+		return message;
+	}
+	
+	/**
+	 * Create test locations in the DB
+	 */
+	private void createDummyAlerts() {
+		// Near CMU
+		db.dbCreateAlert("Electronics", 40.44563, -79.948727);		// Chinese food place
+		db.dbCreateAlert("Clothing", 	40.445375, -79.94866);		// Corner across Quiznos
+		db.dbCreateAlert("Food", 		40.444697, -79.94862);		// Pizza Guy
+		
+		// Test locations for Seattle's Costco HQ
+//		db.dbCreateAlert("Electronics", 47.551336, -122.065294);
+//		db.dbCreateAlert("Clothing", 	47.551604, -122.065369);
+//		db.dbCreateAlert("Food", 		47.551376, -122.065149);
+	}
     
 	/**
 	 * Toggle list Proximity Alerts on/off
@@ -203,32 +228,27 @@ public class ViewListActivity extends Activity  {
 		// Is the toggle on?
 		boolean proxAlertsOn = ((ToggleButton) view).isChecked();
 		
-		// Retrieve the customer's shopping list
+		// Retrieve the customer's shopping list and proximity alerts
 		Map<String, ArrayList<ShoppingListItem>> shoppingList = cust.getShoppingList();
+		Map<String, Location> proximityAlerts = db.dbGetProxAlerts();
 		
-		if (proxAlertsOn) {
+		// Make dummy alerts if you need to
+		if(proximityAlerts.isEmpty()) {
+			createDummyAlerts();
+		}
+		
+		if(proxAlertsOn) {
 			// Add proximity alerts for every category on the user's list
-			for (String category : shoppingList.keySet()) {
+			for (String category : proximityAlerts.keySet()) {
 				Log.i(TAG, "Adding proximity alert for " + category + " at (" 
-						+ categories.get(category).getLat() + ", " + categories.get(category).getLon() + ").");
+						+ proximityAlerts.get(category).getLat() + ", " + proximityAlerts.get(category).getLon() + ").");
 				
 				// Build a message string
 				List<ShoppingListItem> items = shoppingList.get(category);
-				String itemText = "";
-				// Create a nice comma-separated list of items with an 'and' at the end; TODO: make cleaner
-				if(items.size() == 1) itemText = items.get(0).getItem().getDescription();
-					else if(items.size() == 2) itemText = items.get(0).getItem().getDescription()
-							+ " and " + items.get(1).getItem().getDescription();
-					else {
-						for(int i=0; i<items.size()-1; i++) {
-							itemText += items.get(i).getItem().getDescription() + ", ";
-						}
-						itemText += "and " + items.get(items.size()-1).getItem().getDescription();
-					}
-				String message = "You are near the " + category + " section. Don't forget to buy " + itemText + "!";
+				String message = printListReminder(category, items);
 				
 				// Add the proximity alert
-				Location categoryLoc = categories.get(category);
+				Location categoryLoc = proximityAlerts.get(category);
 				ShoppingListApplication application = (ShoppingListApplication)getApplication();
 				application.addProximityAlert(categoryLoc.getLat(), categoryLoc.getLon(), 15, -1, message);
 			}

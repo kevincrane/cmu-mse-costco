@@ -40,5 +40,14 @@ public class DbContract {
 		public static final String CATEGORY_ID = "category_id";
 		public static final String CAT_NAME = "cat_name";
 	}
+	
+	/** Constants for Alerts table in DB */
+	public static abstract class AlertsEntry implements BaseColumns {
+		public static final String TABLE_NAME = "alerts";
+		public static final String ALERT_ID = "alert_id";
+		public static final String CATEGORY_NAME = "category_name";
+		public static final String LATITUDE = "latitude";
+		public static final String LONGITUDE = "longitude";
+	}
 
 }

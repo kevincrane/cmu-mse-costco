@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 /**
@@ -49,6 +50,14 @@ public class NotificationActivity extends Activity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         
+        // Populate Alert Category spinner with possible categories
+        Spinner spinner = (Spinner)findViewById(R.id.alertCategory);
+        ArrayAdapter<CharSequence> catAdapter = ArrayAdapter.createFromResource(this,
+        		R.array.categories, android.R.layout.simple_spinner_item);
+		catAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+		spinner.setAdapter(catAdapter);
+        
+		
         poi = new HashMap<String,List<Double>>();
         
         alertList = (ListView)findViewById(R.id.alertList);
@@ -77,7 +86,6 @@ public class NotificationActivity extends Activity implements LocationListener {
 			locationManager.removeUpdates(this);
 			locationManager = null;
 		}
-		
 	}
 
     @Override
@@ -93,7 +101,7 @@ public class NotificationActivity extends Activity implements LocationListener {
     	
     	this.lat = (EditText)findViewById(R.id.Latitude);		
 		this.lon = (EditText)findViewById(R.id.Longitude);
-		this.alertName = (EditText)findViewById(R.id.alertName);
+		this.alertName = (EditText)findViewById(R.id.alertCategory);
 		
 		// check if alertName already exists
 		if(poi.containsKey(alertName.getText().toString())) {
@@ -117,6 +125,12 @@ public class NotificationActivity extends Activity implements LocationListener {
 
     	return false;
     }
+    
+    
+//    TODO:
+//    	IN THIS CLASS, MAKE ADD BUTTON ADD ALERT TO DB
+//    	IN THIS CLASS, GET ALL ALERTS, ADD NEW ROW SHOWING WHICH ALERTS CURRENTLY THERE
+//    	BONUS POINTS: X BUTTON TO DELETE ALERT FROM DB
 
 
 

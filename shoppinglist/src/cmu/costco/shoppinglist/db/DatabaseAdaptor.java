@@ -11,6 +11,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import cmu.costco.shoppinglist.objects.Category.Location;
 import cmu.costco.shoppinglist.objects.Customer;
 import cmu.costco.shoppinglist.objects.Item;
 import cmu.costco.shoppinglist.objects.ShoppingListItem;
@@ -35,6 +36,7 @@ public class DatabaseAdaptor {
     private static class DatabaseHelper extends SQLiteOpenHelper {
 		private static final String TEXT_TYPE = " TEXT";
 		private static final String INT_TYPE = " INTEGER";
+		private static final String DOUBLE_TYPE = " DOUBLE";
 		private static final String COMMA_SEP = ",";
 		private static final String SQL_CREATE_CUSTOMER =
 		    "CREATE TABLE " + DbContract.CustomerEntry.TABLE_NAME + " (" +
@@ -65,6 +67,13 @@ public class DatabaseAdaptor {
 			    DbContract.CategoryEntry.CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 			    DbContract.CategoryEntry.CAT_NAME + TEXT_TYPE +
 			    " )";
+		
+		private static final String SQL_CREATE_ALERTS = 
+				"CREATE TABLE " + DbContract.AlertsEntry.TABLE_NAME + " (" +
+				DbContract.AlertsEntry.ALERT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+				DbContract.AlertsEntry.CATEGORY_NAME + TEXT_TYPE + COMMA_SEP +
+				DbContract.AlertsEntry.LATITUDE + DOUBLE_TYPE + COMMA_SEP +
+				DbContract.AlertsEntry.LONGITUDE + DOUBLE_TYPE + " )";
 	
 		//TODO: doesn't work
 		private static final String SQL_DELETE_ENTRIES =
@@ -90,6 +99,7 @@ public class DatabaseAdaptor {
 			db.execSQL(SQL_CREATE_LISTITEM);
 			db.execSQL(SQL_CREATE_ITEM);
 			db.execSQL(SQL_CREATE_CATEGORY);
+			db.execSQL(SQL_CREATE_ALERTS);
 		}
 	
 		/**
@@ -293,6 +303,52 @@ public class DatabaseAdaptor {
 	}
 	
 	
+	/**
+	 * Return a map of all proximity alerts, tying category name to GPS coordinates
+	 * @param memberId
+	 * @return
+	 */
+	public Map<String, Location> dbGetProxAlerts() {
+		// Return cursor location of row with matching memberId
+		Cursor mCursor = db.query(true, DbContract.AlertsEntry.TABLE_NAME, 
+				new String[] {
+					DbContract.AlertsEntry.CATEGORY_NAME,
+					DbContract.AlertsEntry.LATITUDE,
+					DbContract.AlertsEntry.LONGITUDE
+				}, null, null,
+				null, null, null, null);
+		if (mCursor != null && mCursor.getCount() > 0) {
+			mCursor.moveToFirst();
+			Log.d(TAG, "Read list of Proximity Alerts, found " + mCursor.getCount() + " matches.");
+		} else {
+			// No matches found
+			Log.d(TAG, "No Proximity Alerts found.");
+			return null;
+		}
+		
+		
+		// Create the map object of proximity alerts
+		Map<String, Location> proximityAlerts = new HashMap<String, Location>();
+		
+		// Iterate through all Proximity Alerts found
+		for(int i=0; i<mCursor.getCount(); i++) {
+			String category = mCursor.getString(
+				    mCursor.getColumnIndexOrThrow(DbContract.AlertsEntry.CATEGORY_NAME)
+					);
+			Double latitude = mCursor.getDouble(
+					mCursor.getColumnIndexOrThrow(DbContract.AlertsEntry.LATITUDE));
+			Double longitude = mCursor.getDouble(
+					mCursor.getColumnIndexOrThrow(DbContract.AlertsEntry.LONGITUDE));
+			
+			// Add new proximity alert and move on to the next
+			proximityAlerts.put(category, new Location(latitude, longitude));
+			mCursor.moveToNext();
+		}
+		
+		return proximityAlerts;
+	}
+	
+	
 //		##### DB CREATE METHODS #####
 	
 	/**
@@ -347,6 +403,24 @@ public class DatabaseAdaptor {
 		
 		// Insert the new row, returning the primary key value of the new row (itemId)
 		return (int)db.insert(DbContract.ItemEntry.TABLE_NAME, null, values);
+	}
+	
+	/**
+	 * Create a new proximity alert with name 'category' at location (latitude, longitude)
+	 * @param category
+	 * @param latitude
+	 * @param longitude
+	 * @return
+	 */
+	public int dbCreateAlert(String category, double latitude, double longitude) {
+		// Create a new map of values, where column names are the keys
+		ContentValues values = new ContentValues();
+		values.put(DbContract.AlertsEntry.CATEGORY_NAME, category);
+		values.put(DbContract.AlertsEntry.LATITUDE, latitude);
+		values.put(DbContract.AlertsEntry.LONGITUDE, longitude);
+		
+		// Insert the new row, returning the primary key value of the new row (itemId)
+		return (int)db.insert(DbContract.AlertsEntry.TABLE_NAME, null, values);
 	}
 	
 	

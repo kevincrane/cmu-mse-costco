@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/alertName"
+        android:layout_below="@+id/alertCategory"
         android:text="Location" />
 
     <EditText
@@ -34,20 +34,20 @@
         <requestFocus />
     </EditText>
 
-    <EditText
+<!--     <EditText
         android:id="@+id/alertName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/Latitude"
         android:ems="10"
-        android:text="Alert Name" />
+        android:text="Alert Name" /> -->
 
     <EditText
         android:id="@+id/Longitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/alertName"
+        android:layout_below="@+id/alertCategory"
         android:layout_toRightOf="@+id/textView2"
         android:ems="7"
         android:text="122.084095" />
@@ -69,5 +69,12 @@
         android:horizontalSpacing="10dp"
         android:stretchMode="columnWidth" />
 
+    <Spinner
+        android:id="@+id/alertCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textView1"
+        android:ems="10" />
 
 </RelativeLayout>

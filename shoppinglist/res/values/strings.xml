@@ -15,7 +15,8 @@
     <string name="editListCategory">Category</string>
     <string name="editListCatPrompt">Select a Category:</string>
     <string name="editListVoiceButton">Voice</string>
-    <string name="toggleProxAlertLabel">Toggle Proximity Alerts:</string> 
+    <string name="toggleProxAlertLabel">Toggle Proximity Alerts:</string>
+    <string name="manageProxAlertMenuLabel">Manage Proximity Alert</string>
 
     <string-array name="categories">
         <item>Appliances</item>
