@@ -323,7 +323,7 @@ public class DatabaseAdaptor {
 		} else {
 			// No matches found
 			Log.d(TAG, "No Proximity Alerts found.");
-			return null;
+			return new HashMap<String, Location>();
 		}
 		
 		

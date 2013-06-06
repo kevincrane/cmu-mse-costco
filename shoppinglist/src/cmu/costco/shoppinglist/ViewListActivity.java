@@ -186,7 +186,7 @@ public class ViewListActivity extends Activity  {
 	private String printListReminder(String category, List<ShoppingListItem> items) {
 		String itemText = "";
 		// Create a nice comma-separated list of items with an 'and' at the end; TODO: make cleaner
-		if(items.isEmpty()) { 
+		if(items == null || items.isEmpty()) { 
 			itemText = "something";
 		} else if(items.size() == 1) {
 			itemText = items.get(0).getItem().getDescription();
@@ -234,6 +234,7 @@ public class ViewListActivity extends Activity  {
 		
 		// Make dummy alerts if you need to
 		if(proximityAlerts.isEmpty()) {
+			Log.i("proxalert", "No Proximity Alerts were present, creating dummy alerts.");
 			createDummyAlerts();
 		}
 		

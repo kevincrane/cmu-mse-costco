@@ -22,16 +22,14 @@
         android:text="Location" />
 
     <EditText
-        android:id="@+id/Latitude"
+        android:id="@+id/Longitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/Longitude"
-        android:layout_alignBottom="@+id/Longitude"
-        android:layout_toRightOf="@+id/Longitude"
+        android:layout_alignBaseline="@+id/Latitude"
+        android:layout_alignBottom="@+id/Latitude"
+        android:layout_toRightOf="@+id/Latitude"
         android:ems="7"
-        android:text="37.422006" >
-
-        <requestFocus />
+        android:text="-79.948843" >
     </EditText>
 
 <!--     <EditText
@@ -44,13 +42,14 @@
         android:text="Alert Name" /> -->
 
     <EditText
-        android:id="@+id/Longitude"
+        android:id="@+id/Latitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/alertCategory"
         android:layout_toRightOf="@+id/textView2"
         android:ems="7"
-        android:text="122.084095" />
+        android:text="40.445849" >
+    </EditText>
 
     <Button
         android:id="@+id/btnAddAlert"

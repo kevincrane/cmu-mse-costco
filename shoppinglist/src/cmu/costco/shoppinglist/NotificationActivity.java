@@ -2,7 +2,6 @@ package cmu.costco.shoppinglist;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
@@ -19,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
+import cmu.costco.shoppinglist.db.DatabaseAdaptor;
+import cmu.costco.shoppinglist.objects.Category;
 
 /**
  * Notification activity
@@ -29,26 +30,26 @@ public class NotificationActivity extends Activity implements LocationListener {
 
 	private LocationManager locationManager;
 	
-	private EditText lat;
-	private EditText lon;
-	private EditText alertName;
-	
-	
-	private ListView alertList;
-	private ArrayList<String> list;
+	private ListView alertListView;
+	private ArrayList<String> alertList;
 	private ArrayAdapter<String> adapter;
 	
-	
-	private Map<String,List<Double>> poi;
+	private Map<String, Category.Location> poi;
 	
 	private final float RADIUS = 2;
 	private final int EXPIRATION = -1;
+	
+	private DatabaseAdaptor db;
 	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+        
+        // Open database
+ 		db = new DatabaseAdaptor(this);
+ 		db.open();
         
         // Populate Alert Category spinner with possible categories
         Spinner spinner = (Spinner)findViewById(R.id.alertCategory);
@@ -58,12 +59,21 @@ public class NotificationActivity extends Activity implements LocationListener {
 		spinner.setAdapter(catAdapter);
         
 		
-        poi = new HashMap<String,List<Double>>();
+        poi = new HashMap<String, Category.Location>();
         
-        alertList = (ListView)findViewById(R.id.alertList);
-        list = new ArrayList<String>();
-    	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-    	alertList.setAdapter(adapter);
+        // Create adapter for alertList that allows us to display all the current alerts
+        alertListView = (ListView)findViewById(R.id.alertList);
+        alertList = new ArrayList<String>();
+    	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, alertList);
+    	alertListView.setAdapter(adapter);
+    	
+    	// Add all existing proximity alerts to ListView
+    	Map<String, Category.Location> proximityAlerts = db.dbGetProxAlerts();
+    	for(String category : proximityAlerts.keySet()) {
+    		alertList.add(category + " - (" + proximityAlerts.get(category).getLat() + 
+    				", " + proximityAlerts.get(category).getLon()+ ")");
+    	}
+    	adapter.notifyDataSetChanged();
     	
     	//Register the listener with the Location Manager to receive location updates
 		locationManager =
@@ -80,9 +90,7 @@ public class NotificationActivity extends Activity implements LocationListener {
     @Override
 	public void onPause() {
 		super.onPause();
-		
-		if(locationManager!=null)
-		{
+		if(locationManager!=null) {
 			locationManager.removeUpdates(this);
 			locationManager = null;
 		}
@@ -95,50 +103,61 @@ public class NotificationActivity extends Activity implements LocationListener {
     }
     
     
+    /**
+     * Called on "Add Alert" button press
+     * @param v
+     * @return
+     */
     public boolean alertOnClick(View v) {
-    	
-    	List<Double> coordinates = new ArrayList<Double>();
-    	
-    	this.lat = (EditText)findViewById(R.id.Latitude);		
-		this.lon = (EditText)findViewById(R.id.Longitude);
-		this.alertName = (EditText)findViewById(R.id.alertCategory);
+    	double latitude, longitude; 
+    	EditText lat = (EditText)findViewById(R.id.Latitude);		
+		EditText lon = (EditText)findViewById(R.id.Longitude);
+		Spinner alertCategory = (Spinner)findViewById(R.id.alertCategory);
+		String category = alertCategory.getSelectedItem().toString();
 		
-		// check if alertName already exists
-		if(poi.containsKey(alertName.getText().toString())) {
+		// check if alertCategory already exists
+		if(poi.containsKey(category)) {
 			Toast.makeText(this, "Name already exists", Toast.LENGTH_LONG).show();
 			return false;
 		}
+		
+    	try {
+			latitude = Double.parseDouble(lat.getText().toString());
+			longitude = Double.parseDouble(lon.getText().toString());
+    	} catch(NumberFormatException e) {
+    		Log.e("scanner", "Error parsing latitude and longitude as numbers.");
+    		return false;
+    	}
     	
-    	coordinates.add(Double.valueOf(this.lat.getText().toString()));
-    	coordinates.add(Double.valueOf(this.lon.getText().toString()));
+    	poi.put(category, new Category.Location(latitude, longitude));
     	
-    	poi.put(this.alertName.getText().toString(), coordinates);
+    	ShoppingListApplication application = (ShoppingListApplication)getApplication();
+    	application.addProximityAlert(latitude, longitude, RADIUS, 
+    			EXPIRATION, category);
     	
-    	ShoppingListApplication application = 
-    			(ShoppingListApplication) getApplication();
-    	application.addProximityAlert(coordinates.get(0), coordinates.get(1), 
-    			RADIUS, EXPIRATION, this.alertName.getText().toString());
-    	
-   	
-    	list.add(this.alertName.getText().toString());
+    	// Add new alert to the DB
+    	db.dbCreateAlert(category, latitude, longitude);
+    	alertList.add(category + " - (" + latitude + ", " + longitude + ")");
     	adapter.notifyDataSetChanged();
+    	
+    	// Show alert onscreen to indicate to user that alert made successfully
+    	Toast.makeText(this, "New alert created for '" + category + "' at ("
+    			+ latitude + ", " + longitude + ")!", Toast.LENGTH_LONG).show();
 
-    	return false;
+    	return true;
     }
     
     
 //    TODO:
-//    	IN THIS CLASS, MAKE ADD BUTTON ADD ALERT TO DB
-//    	IN THIS CLASS, GET ALL ALERTS, ADD NEW ROW SHOWING WHICH ALERTS CURRENTLY THERE
-//    	BONUS POINTS: X BUTTON TO DELETE ALERT FROM DB
+//    	BONUS POINTS: X BUTTON TO DELETE ALERT FROM DB; look at how editlistactivity and its special row did it
 
 
 
 	@Override
 	public void onLocationChanged(Location location) {
 		// Get GPS coordinates
-		lat = (EditText)findViewById(R.id.Latitude);		
-		lon = (EditText)findViewById(R.id.Longitude);
+		EditText lat = (EditText)findViewById(R.id.Latitude);		
+		EditText lon = (EditText)findViewById(R.id.Longitude);
 		
 		lat.setText(Double.toString(location.getLatitude()));
 		lon.setText(Double.toString(location.getLongitude()));        	
