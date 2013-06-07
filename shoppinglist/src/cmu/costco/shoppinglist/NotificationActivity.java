@@ -1,6 +1,5 @@
 package cmu.costco.shoppinglist;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,10 +12,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import cmu.costco.shoppinglist.db.DatabaseAdaptor;
 import cmu.costco.shoppinglist.objects.Category;
@@ -30,11 +33,10 @@ public class NotificationActivity extends Activity implements LocationListener {
 
 	private LocationManager locationManager;
 	
-	private ListView alertListView;
-	private ArrayList<String> alertList;
-	private ArrayAdapter<String> adapter;
-	
+	private LinearLayout alertListView;
 	private Map<String, Category.Location> poi;
+	private double currentLatitude;
+	private double currentLongitude;
 	
 	private final float RADIUS = 2;
 	private final int EXPIRATION = -1;
@@ -57,23 +59,17 @@ public class NotificationActivity extends Activity implements LocationListener {
         		R.array.categories, android.R.layout.simple_spinner_item);
 		catAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
 		spinner.setAdapter(catAdapter);
-        
 		
         poi = new HashMap<String, Category.Location>();
         
         // Create adapter for alertList that allows us to display all the current alerts
-        alertListView = (ListView)findViewById(R.id.alertList);
-        alertList = new ArrayList<String>();
-    	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, alertList);
-    	alertListView.setAdapter(adapter);
+        alertListView = (LinearLayout)findViewById(R.id.alertList);
     	
     	// Add all existing proximity alerts to ListView
     	Map<String, Category.Location> proximityAlerts = db.dbGetProxAlerts();
     	for(String category : proximityAlerts.keySet()) {
-    		alertList.add(category + " - (" + proximityAlerts.get(category).getLat() + 
-    				", " + proximityAlerts.get(category).getLon()+ ")");
+    		alertListView.addView(createProxAlertRow(this, category, proximityAlerts.get(category)));
     	}
-    	adapter.notifyDataSetChanged();
     	
     	//Register the listener with the Location Manager to receive location updates
 		locationManager =
@@ -87,7 +83,32 @@ public class NotificationActivity extends Activity implements LocationListener {
 		}
     }
     
-    @Override
+    private View createProxAlertRow(final Context ctx, final String category, final Category.Location location) {
+    	// Create the view that will be returned
+        View view = getLayoutInflater().inflate(R.layout.activity_prox_alert_row, null);
+        
+        // Add Delete Proximity Alert listener
+        Button deleteButton = (Button)view.findViewById(R.id.proxAlertDelete);
+        deleteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.i("NotificationActivity", "Deleting proximity alert for category '" + category + "'.");
+				db.dbDeleteProxAlert(category, location.getLat(), location.getLon());
+				((ViewGroup)v.getParent()).removeAllViews();
+				Toast.makeText(ctx, "Deleted proximity alert for category '" + 
+						category + "'.", Toast.LENGTH_LONG).show();
+			}
+		});
+
+        // Fill row with item text
+        TextView text = (TextView)view.findViewById(R.id.proxAlertText);
+		text.setText(category + " (" + location.getLat() + ", " + location.getLon()+ ")");
+		
+		// Return the generated row view
+		return view;
+	}
+
+	@Override
 	public void onPause() {
 		super.onPause();
 		if(locationManager!=null) {
@@ -137,8 +158,7 @@ public class NotificationActivity extends Activity implements LocationListener {
     	
     	// Add new alert to the DB
     	db.dbCreateAlert(category, latitude, longitude);
-    	alertList.add(category + " - (" + latitude + ", " + longitude + ")");
-    	adapter.notifyDataSetChanged();
+    	alertListView.addView(createProxAlertRow(this, category, new Category.Location(latitude, longitude)));
     	
     	// Show alert onscreen to indicate to user that alert made successfully
     	Toast.makeText(this, "New alert created for '" + category + "' at ("
@@ -148,19 +168,29 @@ public class NotificationActivity extends Activity implements LocationListener {
     }
     
     
-//    TODO:
-//    	BONUS POINTS: X BUTTON TO DELETE ALERT FROM DB; look at how editlistactivity and its special row did it
-
-
-
-	@Override
-	public void onLocationChanged(Location location) {
-		// Get GPS coordinates
+    /**
+     * Set the input text boxes to the user's current GPS coords 
+     * @param view
+     */
+    public void getCurrentLocation(View view) {
+    	// Get GPS coordinates
 		EditText lat = (EditText)findViewById(R.id.Latitude);		
 		EditText lon = (EditText)findViewById(R.id.Longitude);
 		
-		lat.setText(Double.toString(location.getLatitude()));
-		lon.setText(Double.toString(location.getLongitude()));        	
+		if(currentLatitude != 0 && currentLongitude != 0) {
+			lat.setText(currentLatitude + "");
+			lon.setText(currentLongitude + "");
+		} else {
+			Toast.makeText(this, "Could not detect your location. Please wait until we can locate you " +
+					"or move to somewhere with better signal.", Toast.LENGTH_LONG).show();
+		}
+    }
+    
+    
+	@Override
+	public void onLocationChanged(Location location) {
+		currentLatitude = location.getLatitude();
+		currentLongitude = location.getLongitude();
 	}
 	
 	@Override

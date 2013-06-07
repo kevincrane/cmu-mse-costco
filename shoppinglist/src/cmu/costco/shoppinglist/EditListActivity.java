@@ -84,6 +84,12 @@ public class EditListActivity extends Activity {
 	}
 	
 	
+	/**
+	 * Generate a LinearLayout list of all of the items on a user's shopping list
+	 * @param ctx
+	 * @param shoppingList
+	 * @return
+	 */
 	private LinearLayout generateEditListView(Context ctx, Map<String, ArrayList<ShoppingListItem>> shoppingList) {
 		// Create the view that will be returned
 		LinearLayout view = new LinearLayout(ctx);

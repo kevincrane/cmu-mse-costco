@@ -19,6 +19,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import cmu.costco.shoppinglist.db.DatabaseAdaptor;
 import cmu.costco.shoppinglist.objects.Category.Location;
@@ -253,10 +254,13 @@ public class ViewListActivity extends Activity  {
 				ShoppingListApplication application = (ShoppingListApplication)getApplication();
 				application.addProximityAlert(categoryLoc.getLat(), categoryLoc.getLon(), 15, -1, message);
 			}
+			Toast.makeText(this, "Activated " + proximityAlerts.size() + " proximity alerts.", 
+					Toast.LENGTH_LONG).show();
 		} else {
 			// Remove proximity alerts for every category on the user's list
 			ShoppingListApplication application = (ShoppingListApplication)getApplication();
 			application.removeAllProximityAlerts();
+			Toast.makeText(this, "Deactivated all proximity alerts.", Toast.LENGTH_LONG).show();
 		}
 
 	}

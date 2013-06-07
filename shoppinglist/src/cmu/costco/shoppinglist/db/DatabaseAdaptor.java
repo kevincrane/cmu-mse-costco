@@ -71,7 +71,7 @@ public class DatabaseAdaptor {
 		private static final String SQL_CREATE_ALERTS = 
 				"CREATE TABLE " + DbContract.AlertsEntry.TABLE_NAME + " (" +
 				DbContract.AlertsEntry.ALERT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-				DbContract.AlertsEntry.CATEGORY_NAME + TEXT_TYPE + COMMA_SEP +
+				DbContract.AlertsEntry.CATEGORY_NAME + " TEXT"+ COMMA_SEP +
 				DbContract.AlertsEntry.LATITUDE + DOUBLE_TYPE + COMMA_SEP +
 				DbContract.AlertsEntry.LONGITUDE + DOUBLE_TYPE + " )";
 	
@@ -475,6 +475,18 @@ public class DatabaseAdaptor {
 		String selection = DbContract.ItemEntry.ITEM_ID + "=" + itemId;
 		
 		return (int)db.update(DbContract.ItemEntry.TABLE_NAME, values, selection, null);
+	}
+
+	/**
+	 * Delete a proximity alert of a given category from the DB
+	 * @param category
+	 */
+	public int dbDeleteProxAlert(String category, double latitude, double longitude) {
+		// Which row to delete, based on 'category'
+		String selection = DbContract.AlertsEntry.CATEGORY_NAME + "='" + category + "'" +
+				" AND " + DbContract.AlertsEntry.LATITUDE + "=" + latitude + 
+				" AND " + DbContract.AlertsEntry.LONGITUDE + "=" + longitude;
+		return (int)db.delete(DbContract.AlertsEntry.TABLE_NAME, selection, null);
 	}
     
 }

@@ -9,7 +9,7 @@
     <string name="loginEmailText">Email:</string>
     <string name="loginPwordText">Password:</string>
     <string name="viewListEditButtonText">Edit List</string>
-    <string name="editListDelete">Delete</string>
+    <string name="editListDelete">X</string>
     <string name="editListAddButtonText">New Item</string>
     <string name="editListSaveButtonText">Save List</string>
     <string name="editListCategory">Category</string>
