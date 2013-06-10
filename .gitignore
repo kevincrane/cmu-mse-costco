@@ -17,3 +17,4 @@ local.properties
 
 # Keystore for signing APKs
 cmu-mse-keystore
+keystorepword

@@ -237,6 +237,7 @@ public class ViewListActivity extends Activity  {
 		if(proximityAlerts.isEmpty()) {
 			Log.i("proxalert", "No Proximity Alerts were present, creating dummy alerts.");
 			createDummyAlerts();
+			shoppingList = cust.getShoppingList();
 		}
 		
 		if(proxAlertsOn) {
