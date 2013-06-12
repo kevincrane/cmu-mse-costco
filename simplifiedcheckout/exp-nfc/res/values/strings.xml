@@ -4,5 +4,7 @@
     <string name="app_name">SimplifiedCheckout-NFC</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_customer">CustomerActivity</string>
+    <string name="title_activity_cashier">CashierActivity</string>
 
 </resources>

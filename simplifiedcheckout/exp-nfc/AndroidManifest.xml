@@ -22,6 +22,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="cmu.costco.simplifiedcheckout.nfc.CustomerActivity"
+            android:label="@string/title_activity_customer"
+            android:parentActivityName="cmu.costco.simplifiedcheckout.nfc.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cmu.costco.simplifiedcheckout.nfc.MainActivity" />
+        </activity>
+        <activity
+            android:name="cmu.costco.simplifiedcheckout.nfc.CashierActivity"
+            android:label="@string/title_activity_cashier"
+            android:parentActivityName="cmu.costco.simplifiedcheckout.nfc.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cmu.costco.simplifiedcheckout.nfc.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
