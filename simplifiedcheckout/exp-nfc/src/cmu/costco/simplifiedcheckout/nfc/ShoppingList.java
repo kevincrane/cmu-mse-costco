@@ -2,12 +2,18 @@ package cmu.costco.simplifiedcheckout.nfc;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingList implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public String shopper;
 	public List<StoreItem> storeItems;
+	
+	public ShoppingList(String shopper) {
+		this.shopper = shopper;
+		storeItems = new ArrayList<StoreItem>();
+	}
 	
 	@Override
 	public String toString() {
@@ -28,5 +34,16 @@ public class ShoppingList implements Serializable {
 	
 	public void addItem(StoreItem item) {
 		storeItems.add(item);
+	}
+	
+	public int size() {
+		return storeItems.size();
+	}
+	
+	public StoreItem get(int i) {
+		if(i >= storeItems.size()) {
+			return null;
+		}
+		return storeItems.get(i);
 	}
 }

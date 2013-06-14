@@ -9,16 +9,6 @@
     tools:context=".CustomerActivity" >
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="0dp"
-        android:text="Customer Mode"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/textView1"
         android:layout_below="@+id/textView1"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="8dp"
         android:text="UPC:" />
     <EditText
         android:id="@+id/upcText"
@@ -58,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/textView3"
         android:layout_below="@+id/textView3"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="8dp"
         android:text="Price:" />
 
     <TextView
@@ -67,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/textView4"
         android:layout_below="@+id/textView4"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="8dp"
         android:text="Quantity:" />
 
     <EditText
@@ -77,7 +67,7 @@
         android:layout_alignBottom="@+id/textView4"
         android:layout_toRightOf="@+id/textView3"
         android:ems="4"
-        android:inputType="number" >
+        android:inputType="numberDecimal" >
     </EditText>
 
     <EditText
@@ -105,7 +95,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Send to Cashier" 
+        android:text="Send to Cashier"
+        android:textAppearance="?android:attr/textAppearanceMedium" 
         android:onClick="broadcastShoppingList"/>
 
     <ScrollView
@@ -124,5 +115,14 @@
             android:orientation="vertical" >
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Customer Mode"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
