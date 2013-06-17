@@ -1,8 +1,12 @@
 package cmu.costco.simplifiedcheckout.nfc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -12,11 +16,7 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
-import android.support.v4.app.NavUtils;
-import android.text.format.Time;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -28,6 +28,7 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 
 	private final static String TAG = "CustomerActivity";
 	private ShoppingList shoppingList;
+	NfcAdapter nfcAdapter;
 	private static final int MESSAGE_SENT = 1;
 	
 	@Override
@@ -47,30 +48,15 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 		updateShoppingListView();
 		
 		// Set up NFC Adapter
-		NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null) {
 			Toast.makeText(this, "NFC is not available on this device. :(", Toast.LENGTH_LONG).show();
 			return;  // NFC not available on this device
 		}
 		nfcAdapter.setNdefPushMessageCallback(this, this);
 		nfcAdapter.setOnNdefPushCompleteCallback(this, this);
-
-		
-		//TODO:
-		//	Make broadcast function (look at how NFC works and do that)
-		//	Make Cashier one (when they touch, receive serialized ShoppingList, deserialize it, print as string)
 	}
 	
-	@Override
-    public void onResume() {
-		super.onResume();
-		// Check to see that the Activity started due to an Android Beam
-		if(NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-			processIntent(getIntent());
-		}
-    }
-
-
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */
@@ -78,24 +64,6 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.customer, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
-	
 	/**
 	 * Update the shopping list view (LinearLayout) in the customer mode
 	 */
@@ -111,6 +79,27 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 		}
 	}
 	
+	/**
+	 * Convert a serializable object 
+	 * @param object
+	 * @return
+	 * @throws IOException
+	 */
+	private byte[] serializeObject(Object object) throws IOException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out = null;
+		byte[] serialized;
+		try {
+			out = new ObjectOutputStream(bos);   
+			out.writeObject(object);
+			serialized = bos.toByteArray();
+		} finally {
+			out.close();
+			bos.close();
+		}
+		return serialized;
+	}
+	
 	
 	/**
 	 * Called when the Add To Cart button is pressed; adds new StoreItem to ShoppingList
@@ -120,7 +109,6 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 		double price;
 		int quantity;
 		// Find EditText views
-		//TODO: also clear all the text from each box after entering
 		EditText productText = (EditText)findViewById(R.id.prodNameText);
 		EditText upcText = (EditText)findViewById(R.id.upcText);
 		EditText priceText = (EditText)findViewById(R.id.priceText);
@@ -143,6 +131,12 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 		// Add item to shopping list and update list view
 		shoppingList.addItem(new StoreItem(product, upc, price, quantity));
 		updateShoppingListView();
+		
+		// Clear EditText views
+		productText.setText("");
+		upcText.setText("");
+		priceText.setText("");
+		quantityText.setText("");
 	}
 	
 	/**
@@ -161,36 +155,19 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 	 */
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent event) {
-		Time time = new Time();
-		time.setToNow();
-        String text = ("Beam me up!\n\n" +
-                "Beam Time: " + time.format("%H:%M:%S"));
-        
+        byte[] byteMessage;
+		try {
+			byteMessage = serializeObject(shoppingList);
+		} catch (IOException e) {
+			Log.e(TAG, "Error: could not serialize ShoppingList properly; " + e.getMessage());
+			byteMessage = new byte[1];
+		}
         NdefMessage msg = new NdefMessage(NdefRecord.createMime(
-        		"application/cmu.costco.simplifiedcheckout.nfc", text.getBytes())
+        		"application/cmu.costco.simplifiedcheckout.nfc", byteMessage)
 //        		,NdefRecord.createApplicationRecord("cmu.costco.simplifiedcheckout.nfc")
         );
+        Log.i(TAG, msg.getRecords()[0].toString());
         return msg;
-	}
-	
-	@Override
-	public void onNewIntent(Intent intent) {
-		// onResume gets called after this to handle the intent
-		setIntent(intent);
-	}
-
-	/**
-	 * Parses the NDEF Message from the intent and prints to the TextView
-	 */
-	void processIntent(Intent intent) {
-		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
-				NfcAdapter.EXTRA_NDEF_MESSAGES);
-		// only one message sent during the beam
-		NdefMessage msg = (NdefMessage) rawMsgs[0];
-		// record 0 contains the MIME type, record 1 is the AAR, if present
-		String response = new String(msg.getRecords()[0].getPayload());
-		Toast.makeText(this, response, Toast.LENGTH_LONG).show();
-//		new AlertDialog.Builder(CustomerActivity.this).setTitle(response).create().show();
 	}
 
 	@Override
@@ -201,7 +178,8 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
 	}
 	
 	/** This handler receives a message from onNdefPushComplete */
-    private final Handler mHandler = new Handler() {
+    @SuppressLint("HandlerLeak")
+	private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -211,6 +189,5 @@ public class CustomerActivity extends Activity implements CreateNdefMessageCallb
             }
         }
     };
-
-
+    
 }

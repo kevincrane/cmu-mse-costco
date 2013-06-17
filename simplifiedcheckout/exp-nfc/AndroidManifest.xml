@@ -32,6 +32,7 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="cmu.costco.simplifiedcheckout.nfc.MainActivity" />
+            
         </activity>
         <activity
             android:name="cmu.costco.simplifiedcheckout.nfc.CashierActivity"
@@ -40,6 +41,12 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="cmu.costco.simplifiedcheckout.nfc.MainActivity" />
+            
+            <intent-filter>
+				<action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<data android:mimeType="application/cmu.costco.simplifiedcheckout.nfc"/>
+			</intent-filter>
         </activity>
     </application>
 
