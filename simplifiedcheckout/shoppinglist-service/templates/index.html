@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Simplified Checkout Database Contents</h1>
+    <h3>Customers</h3>
+    <table border="1">
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+        </tr>
+    {% for customer in customers %}
+        <tr>
+            <td>{{ customer.id }}</td>
+            <td>{{ customer.name|safe }}</td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="2">No customers in DB!</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <h3>Products</h3>
+    <table border="1">
+        <tr>
+            <td>UPC</td>
+            <td>Name</td>
+            <td>Price</td>
+        </tr>
+    {% for product in products %}
+        <tr>
+            <td>{{ product.upc }}</td>
+            <td>{{ product.name|safe }}</td>
+            <td>${{ product.price }}</td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="3">No products in DB!</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <h3>Orders</h3>
+    <table border="1">
+        <tr>
+            <td>Id</td>
+            <td>Customer Id</td>
+            <td>UPC</td>
+            <td>Quantity</td>
+        </tr>
+    {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer_id }}</td>
+            <td>{{ order.upc }}</td>
+            <td>{{ order.quantity }}</td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4">No Orders in DB!</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
