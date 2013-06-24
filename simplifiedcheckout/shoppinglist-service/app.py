@@ -4,7 +4,7 @@
 # all the imports
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+     abort, render_template, flash, make_response, jsonify
 from contextlib import closing
 import logging
 
@@ -47,12 +47,58 @@ def not_found(error):
     return make_response(jsonify( { 'error': 'Not found' } ), 404)
 
 
-@app.route('/todo/api/v1.0/tasks', methods = ['GET'])
-def get_tasks():
-    return jsonify( { 'tasks': tasks } )
+@app.route('/costco/api/order/<int:customer_id>', methods = ['GET'])
+def get_order(customer_id):
+    """
+    Public API to view the order for customer_id
+    TODO: security, multiple orders for one person
+    """
+    # Get the order and products for customer_id
+    cur = g.db.execute('SELECT orders.upc, products.name, products.price, orders.quantity FROM orders ' + \
+                    'LEFT JOIN products ON orders.upc=products.upc WHERE orders.customer_id=%d' % customer_id)
+    order = [dict(upc=row[0], name=row[1], price=row[2], quantity=row[3]) for row in cur.fetchall()]
+    if len(order) == 0:
+        abort(404)
+
+    # Get customers name
+    cur = g.db.execute('SELECT name FROM customers WHERE id=%d' % customer_id)
+    row = cur.fetchall()
+    customer = row[0][0] if row else None
+
+    return jsonify( { 'customer': customer, 'order': order } )
+
+
+@app.route('/costco/api/order', methods = ['POST'])
+def create_order():
+    """
+    Read in a JSON request, parse out the order properties, and add to DB
+    """
+    if not request.json or not 'customer' in request.json or not 'order' in request.json:
+        abort(400)
+
+    # Pull out customer and order info from JSON
+    customer = request.json['customer']
+    order = request.json['order']
+
+    # Add the customer name to the customer table and get it's ID
+    cur = g.db.cursor()
+    cur.execute('INSERT INTO customers (name) VALUES (?)', [customer])
+    g.db.commit()
+    customer_id = cur.lastrowid
+
+    # Add each item in the order to the order table
+    for item in order:
+        cur.execute('INSERT INTO orders (customer_id, upc, quantity) VALUES (?, ?, ?)', 
+                [ customer_id, item['upc'], item['quantity'] ])
+    g.db.commit()
+    return jsonify( { 'customer': customer, 'customer_id': customer_id, 'order': order } ), 201
+
 
 @app.route('/')
 def index():
+    """
+    Display the contents of the DBs
+    """
     # Get all customers
     cur = g.db.execute('SELECT id, name FROM customers ORDER BY id ASC')
     customers = [dict(id=row[0], name=row[1]) for row in cur.fetchall()]
@@ -60,11 +106,10 @@ def index():
     # Get all products
     cur = g.db.execute('SELECT upc, name, price FROM products ORDER BY upc ASC')
     products = [dict(upc=row[0], name=row[1], price=row[2]) for row in cur.fetchall()]
-    app.logger.debug("products: %s" % products)
 
     # Get all orders
     cur = g.db.execute('SELECT id, customer_id, upc, quantity FROM orders ORDER BY id ASC')
-    orders = [dict(id=row[0], customer_id=row[1], name=row[2], quantity=row[3]) for row in cur.fetchall()]
+    orders = [dict(id=row[0], customer_id=row[1], upc=row[2], quantity=row[3]) for row in cur.fetchall()]
 
     return render_template('index.html', customers=customers, products=products, orders=orders)
 

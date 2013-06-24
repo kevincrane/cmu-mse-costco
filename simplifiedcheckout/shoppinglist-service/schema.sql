@@ -24,3 +24,6 @@ INSERT INTO products (upc, name, price) VALUES (222222222222, "Apples", 0.50);
 INSERT INTO products (upc, name, price) VALUES (333333333333, "Big TVs", 569.99);
 INSERT INTO products (upc, name, price) VALUES (444444444444, "Bagel Bites", 6.99);
 INSERT INTO products (upc, name, price) VALUES (555555555555, "Bicycles!", 199.99);
+INSERT INTO orders (customer_id, upc, quantity) VALUES (1, 111111111111, 2);
+INSERT INTO orders (customer_id, upc, quantity) VALUES (1, 222222222222, 13);
+INSERT INTO orders (customer_id, upc, quantity) VALUES (1, 444444444444, 3);
