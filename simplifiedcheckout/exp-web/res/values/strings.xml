@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_customer">CustomerActivity</string>
     <string name="title_activity_cashier">CashierActivity</string>
+    <string name="cashierTextDefault">Scan a Customer\'s phone to receive their shopping list.</string>
 
 </resources>

@@ -3,11 +3,8 @@
 
 # all the imports
 import sqlite3
-from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash, make_response, jsonify
+from flask import Flask, request, g, abort, render_template, make_response, jsonify
 from contextlib import closing
-import logging
-
 
 
 # configuration
@@ -21,9 +18,11 @@ PASSWORD = 'default'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+
 # Open and initialize DB
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
+
 
 def init_db():
     with closing(connect_db()) as db:
@@ -31,9 +30,11 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
+
 @app.before_request
 def before_request():
     g.db = connect_db()
+
 
 @app.teardown_request
 def teardown_request(exception):
@@ -44,18 +45,18 @@ def teardown_request(exception):
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify( { 'error': 'Not found' } ), 404)
+    return make_response(jsonify({'error': 'Not found'}), 404)
 
 
-@app.route('/costco/api/order/<int:customer_id>', methods = ['GET'])
+@app.route('/costco/api/order/<int:customer_id>', methods=['GET'])
 def get_order(customer_id):
     """
     Public API to view the order for customer_id
     TODO: security, multiple orders for one person
     """
     # Get the order and products for customer_id
-    cur = g.db.execute('SELECT orders.upc, products.name, products.price, orders.quantity FROM orders ' + \
-                    'LEFT JOIN products ON orders.upc=products.upc WHERE orders.customer_id=%d' % customer_id)
+    cur = g.db.execute('SELECT orders.upc, products.name, products.price, orders.quantity FROM orders ' +
+                       'LEFT JOIN products ON orders.upc=products.upc WHERE orders.customer_id=%d' % customer_id)
     order = [dict(upc=row[0], name=row[1], price=row[2], quantity=row[3]) for row in cur.fetchall()]
     if len(order) == 0:
         abort(404)
@@ -65,10 +66,10 @@ def get_order(customer_id):
     row = cur.fetchall()
     customer = row[0][0] if row else None
 
-    return jsonify( { 'customer': customer, 'order': order } )
+    return jsonify({'customer': customer, 'order': order})
 
 
-@app.route('/costco/api/order', methods = ['POST'])
+@app.route('/costco/api/order', methods=['POST'])
 def create_order():
     """
     Read in a JSON request, parse out the order properties, and add to DB
@@ -88,10 +89,10 @@ def create_order():
 
     # Add each item in the order to the order table
     for item in order:
-        cur.execute('INSERT INTO orders (customer_id, upc, quantity) VALUES (?, ?, ?)', 
-                [ customer_id, item['upc'], item['quantity'] ])
+        cur.execute('INSERT INTO orders (customer_id, upc, quantity) VALUES (?, ?, ?)',
+                    [customer_id, item['upc'], item['quantity']])
     g.db.commit()
-    return jsonify( { 'customer': customer, 'customer_id': customer_id, 'order': order } ), 201
+    return jsonify({'customer': customer, 'customer_id': customer_id, 'order': order}), 201
 
 
 @app.route('/')

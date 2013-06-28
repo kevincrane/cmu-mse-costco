@@ -1,17 +1,10 @@
 package costco.cmu.simplifiedcheckout.web;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +26,7 @@ public class CustomerActivity extends Activity {
 	private final static String TAG = "CustomerActivity";
 	private ShoppingList shoppingList;
 	private String customerName;
-	private final String SERVER_IP = "128.237.126.157";
+	final static String SERVER_IP = "128.237.126.172";
 	private final String API_POST_LOCATION = "/costco/api/order";
 	
 	@Override
@@ -130,7 +123,7 @@ public class CustomerActivity extends Activity {
 		String apiPostAddress = "http://" + SERVER_IP + ":5000" + API_POST_LOCATION; 
 		try {
 			JSONObject jsonObjSend = getJsonObjectFromMap(orderMap);
-			sendAsyncJsonRequest(apiPostAddress, jsonObjSend, this);
+			sendAsyncShoppingListRequest(apiPostAddress, jsonObjSend, this);
 		} catch(Exception e) {
 			e.printStackTrace();
 			Toast.makeText(this, "Something broked. :( \nCheck the looogs.", Toast.LENGTH_LONG).show();
@@ -159,7 +152,13 @@ public class CustomerActivity extends Activity {
 	}
 	
 	
-	private void sendAsyncJsonRequest(String requestUrl, final JSONObject jsonObjSend, final Context ctx) {
+	/**
+	 * Call an asynchronous POST request to the server to save a shopping list.
+	 * @param requestUrl
+	 * @param jsonObjSend
+	 * @param ctx
+	 */
+	private void sendAsyncShoppingListRequest(String requestUrl, final JSONObject jsonObjSend, final Context ctx) {
 		new AsyncTask<String, Void, JSONObject>() {
 		    @Override
 		    protected JSONObject doInBackground(String... urls) {

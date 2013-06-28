@@ -22,8 +22,8 @@
         android:layout_below="@+id/textView2"
         android:layout_toRightOf="@+id/textView1"
         android:ems="10"
-        android:inputType="text" >
-    </EditText>
+        android:inputType="text" 
+        android:windowSoftInputMode="stateHidden"/>
 
     <TextView
         android:id="@+id/textView3"
@@ -40,7 +40,8 @@
         android:layout_alignBottom="@+id/textView3"
         android:layout_alignLeft="@+id/prodNameText"
         android:ems="10"
-        android:inputType="number" />
+        android:inputType="number"
+        android:windowSoftInputMode="stateHidden" />
 
     <TextView
         android:id="@+id/textView4"
@@ -58,7 +59,8 @@
         android:layout_alignRight="@+id/textView4"
         android:layout_below="@+id/textView4"
         android:layout_marginTop="8dp"
-        android:text="Quantity:" />
+        android:text="Quantity:" 
+        android:windowSoftInputMode="stateHidden"/>
 
     <EditText
         android:id="@+id/priceText"
@@ -67,8 +69,8 @@
         android:layout_alignBottom="@+id/textView4"
         android:layout_toRightOf="@+id/textView3"
         android:ems="4"
-        android:inputType="numberDecimal" >
-    </EditText>
+        android:inputType="numberDecimal"
+        android:windowSoftInputMode="stateHidden"/>
 
     <EditText
         android:id="@+id/quantityText"
@@ -77,7 +79,8 @@
         android:layout_alignBottom="@+id/textView5"
         android:layout_alignLeft="@+id/priceText"
         android:ems="4"
-        android:inputType="number" />
+        android:inputType="number" 
+        android:windowSoftInputMode="stateHidden" />
 
     <Button
         android:id="@+id/button1"

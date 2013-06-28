@@ -4,21 +4,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.zip.GZIPInputStream;
-import org.apache.http.Header;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
+
 import android.util.Log;
 
 public class HttpJsonClient {
 	private static final String TAG = "HttpClient";
 
 	public static JSONObject SendHttpPost(String URL, JSONObject jsonObjSend) {
-
 		try {
 			DefaultHttpClient httpclient = new DefaultHttpClient();
 			HttpPost httpPostRequest = new HttpPost(URL);
@@ -51,7 +51,7 @@ public class HttpJsonClient {
 				// Transform the String into a JSONObject
 				JSONObject jsonObjRecv = new JSONObject(resultString);
 				// Raw DEBUG output of our received JSON object:
-				Log.i(TAG,"<JSONObject>\n"+jsonObjRecv.toString()+"\n</JSONObject>");
+				Log.i(TAG,"POST Response: <JSONObject>\n"+jsonObjRecv.toString()+"\n</JSONObject>");
 
 				return jsonObjRecv;
 			}
@@ -62,6 +62,31 @@ public class HttpJsonClient {
 			// More about HTTP exception handling in another tutorial.
 			// For now we just print the stack trace.
 			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	public static JSONObject SendHttpGet(String url) {
+		InputStream content = null;
+		try {
+			DefaultHttpClient httpclient = new DefaultHttpClient();
+			HttpGet httpRequest = new HttpGet(url);
+			httpRequest.setHeader("Accept", "application/json");
+			
+			HttpResponse response = httpclient.execute(httpRequest);
+			HttpEntity entity = response.getEntity();
+			if(entity != null) {
+				String resultString= convertStreamToString(entity.getContent());
+				// Transform the String into a JSONObject
+				JSONObject jsonObjRecv = new JSONObject(resultString);
+				// Raw DEBUG output of our received JSON object:
+				Log.i(TAG,"GET Response: <JSONObject>\n"+jsonObjRecv.toString()+"\n</JSONObject>");
+
+				return jsonObjRecv;
+			}
+		} catch (Exception e) {
+			Log.i(TAG, "Network exception", e);
 		}
 		return null;
 	}
