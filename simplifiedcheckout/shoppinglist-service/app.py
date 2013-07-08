@@ -5,6 +5,8 @@
 import sqlite3
 from flask import Flask, request, g, abort, render_template, make_response, jsonify
 from contextlib import closing
+import requests
+import json
 
 
 # configuration
@@ -48,6 +50,7 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
+##### API calls for reading and posting customer orders
 @app.route('/costco/api/order/<int:customer_id>', methods=['GET'])
 def get_order(customer_id):
     """
@@ -93,6 +96,28 @@ def create_order():
                     [customer_id, item['upc'], item['quantity']])
     g.db.commit()
     return jsonify({'customer': customer, 'customer_id': customer_id, 'order': order}), 201
+
+
+##### API Call for retrieving item from UPC
+@app.route('/costco/api/product/<int:upc>', methods=['GET'])
+def get_product(upc):
+    """
+    Public API to retrieve product information from a UPC
+    TODO: security, multiple orders for one person
+    """
+    API_KEY = "acdb9ffa2045103f7aca2bf1b5d55fbb"
+    API_URL = "http://api.upcdatabase.org/json"
+    req = requests.get("%s/%s/%d" % (API_URL, API_KEY, upc))
+    product_data = json.loads(req.text)
+    response_data = {}
+    if product_data['valid'] == 'false':
+        response_data = {'valid': False, 'reason': product_data['reason']}
+    else:
+        response_data = {'valid': True,
+                         'upc': product_data['number'],
+                         'name': product_data['itemname'],
+                         'price': product_data['avg_price']}
+    return jsonify(response_data)
 
 
 @app.route('/')
