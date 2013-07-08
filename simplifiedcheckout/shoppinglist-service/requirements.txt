@@ -4,4 +4,5 @@ MarkupSafe==0.18
 Werkzeug==0.9.1
 argparse==1.2.1
 itsdangerous==0.21
+requests==1.2.3
 wsgiref==0.1.2
